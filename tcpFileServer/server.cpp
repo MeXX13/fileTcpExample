@@ -17,9 +17,10 @@ void server::start()
 
 void server::incomingConnection(qintptr handle)
 {
+    Client *client = new Client(handle);
     qDebug() << "incomingConnection = " << handle;
     socketThread *thread = new socketThread(handle);
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-
+    clients.append(client);
     thread->start();
 }

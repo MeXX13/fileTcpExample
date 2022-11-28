@@ -3,15 +3,18 @@
 
 #include <QTcpServer>
 #include <QObject>
+#include "client.h"
 
 class server : public QTcpServer
 {
+    friend class socketThread;
     Q_OBJECT
 public:
     explicit server(QHostAddress host = QHostAddress::Any,
                     quint16 port      = 5555,
                     QObject *parent   = nullptr);
     //~server();
+    static QList<Client*> clients; //список пользователей
 
 public slots:
     void start();

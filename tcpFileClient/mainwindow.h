@@ -21,6 +21,10 @@ private slots:
 
     void on_sendPushButton_clicked();
 
+    void on_sendText_clicked();
+
+    void readyRead();
+
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;

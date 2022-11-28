@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QObject>
 #include <QTcpSocket>
+#include "server.h"
 
 class socketThread : public QThread
 {

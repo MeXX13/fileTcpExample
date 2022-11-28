@@ -30,34 +30,47 @@ void socketThread::run()
 
 void socketThread::onReadyRead()
 {
-    QDataStream in(m_socket);
-    in.setVersion(QDataStream::Qt_5_1);
+    QString dataAsString = QString::fromStdString(m_socket->readAll().toStdString());
 
-    if (m_blockSize == 0)
+    if (dataAsString.left(5) == "[msg]")
     {
-        if (m_socket->bytesAvailable() < (qint64)sizeof(quint32))
+        QByteArray qba;
+        qba.append(dataAsString.right(5).toLocal8Bit());
+        qDebug() << m_socketDescriptor << "Data in: " << m_socket->readAll();
+        for (int j = 0; j < server::clients.length(); ++j)
+           server::clients.at(j)->_sok->write(qba);
+    }
+    else
+    {
+        QDataStream in(m_socket);
+        in.setVersion(QDataStream::Qt_5_1);
+
+        if (m_blockSize == 0)
+        {
+            if (m_socket->bytesAvailable() < (qint64)sizeof(quint32))
+                return;
+            in >> m_blockSize;
+        }
+        if (m_socket->bytesAvailable() < m_blockSize)
             return;
-        in >> m_blockSize;
+
+        QString fileName;
+        in >> fileName;
+
+        QByteArray line = m_socket->readAll();
+
+        QString filePath = "O:\\";
+        QFile target(filePath + "\\" + fileName);
+
+
+        if (!target.open(QIODevice::WriteOnly)) {
+            qDebug() << "Can't open file for written";
+            return;
+        }
+        target.write(line);
+
+        target.close();
     }
-    if (m_socket->bytesAvailable() < m_blockSize)
-        return;
-
-    QString fileName;
-    in >> fileName;
-
-    QByteArray line = m_socket->readAll();
-
-    QString filePath = "D:\\csa";
-    QFile target(filePath + "\\" + fileName);
-
-
-    if (!target.open(QIODevice::WriteOnly)) {
-        qDebug() << "Can't open file for written";
-        return;
-    }
-    target.write(line);
-
-    target.close();
 
     //emit onFinishRecieved();
     m_socket->disconnectFromHost();
