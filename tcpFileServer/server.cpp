@@ -13,7 +13,19 @@ void server::start()
         qDebug() << "Server started at " << host.toString() << ":" << port;
     else
         qDebug() << "Can't start server";
+
+//    connect(this, SIGNAL(sendMessagesSignal), this, SLOT(sendMessages));
 }
+
+//void server::sendMessages(QString msg, QTcpSocket *fromSocket)
+//{
+//    foreach(QTcpSocket *socket, SavedClients::getInstance().mClients)
+//    {
+//        if (socket == fromSocket)
+//            continue;
+//        socket->write(msg.toUtf8());
+//    }
+//}
 
 void server::incomingConnection(qintptr handle)
 {

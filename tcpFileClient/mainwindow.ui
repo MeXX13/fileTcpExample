@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>211</width>
-    <height>165</height>
+    <width>410</width>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,7 +48,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
        <widget class="QPushButton" name="pushButton">
         <property name="text">
@@ -66,6 +66,39 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QPlainTextEdit" name="chatField">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPlainTextEdit" name="chatSenderField">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="msgPushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>send message</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </item>
    </layout>
@@ -75,8 +108,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>211</width>
-     <height>21</height>
+     <width>410</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>

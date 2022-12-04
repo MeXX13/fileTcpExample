@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    savedclients.cpp \
     server.cpp \
     socketthread.cpp
 
 HEADERS += \
     mainwindow.h \
+    savedclients.h \
     server.h \
     socketthread.h
 

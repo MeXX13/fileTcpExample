@@ -3,6 +3,7 @@
 
 #include <QTcpServer>
 #include <QObject>
+//#include "savedclients.h"
 
 class server : public QTcpServer
 {
@@ -15,6 +16,7 @@ public:
 
 public slots:
     void start();
+//    void sendMessages(QString msg, QTcpSocket *fromSocket);
 
 protected:
     void incomingConnection(qintptr handle) Q_DECL_OVERRIDE;
@@ -23,6 +25,9 @@ private:
     QObject *interfaceWindow;
     QHostAddress host;
     quint16      port;
+
+//signals:
+//    void sendMessagesSignal(QString msg, QTcpSocket *fromSocket);
 };
 
 #endif // SERVER_H

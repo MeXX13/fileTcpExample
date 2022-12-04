@@ -9,7 +9,7 @@ class socketThread : public QThread
 {
     Q_OBJECT
 public:
-    socketThread(qintptr descriptor, QObject *parent = 0);
+    explicit socketThread(qintptr descriptor, QObject *parent = 0);
     ~socketThread();
 
 protected:
@@ -26,6 +26,12 @@ private:
     qintptr     m_socketDescriptor;
     QTcpSocket *m_socket;
     qint32      m_blockSize = 0;
+
+public slots:
+    void sendMessagesSlot(QString msg, socketThread *st);
+
+signals:
+    void sendMessagesSignal(QString msg, socketThread *st);
 };
 
 

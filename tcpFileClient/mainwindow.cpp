@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QRegExpValidator>
+#include <QRegularExpression>
+#include <QRegularExpressionValidator>
 #include <QMessageBox>
 #include <QHostAddress>
 #include <QFileDialog>
@@ -13,16 +14,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
-    QRegExp ipRegex ("^" + ipRange
+    QRegularExpression ipRegex ("^" + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange
                      + "\\." + ipRange + "$");
-    QRegExpValidator *ipValidator = new QRegExpValidator(ipRegex, this);
+    QRegularExpressionValidator *ipValidator = new QRegularExpressionValidator(ipRegex, this);
     ui->ipLineEdit->setValidator(ipValidator);
+
+    message_history = new QList<Message>();
 }
 
 MainWindow::~MainWindow()
 {
+    delete message_history;
     delete ui;
 }
 
@@ -46,7 +50,15 @@ void MainWindow::on_pushButton_clicked()
     QHostAddress ipAddr(ipStringAddr);
 
     socket = new QTcpSocket(this);
+
     connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
+
+    connect(socket, &QTcpSocket::bytesWritten, this, &MainWindow::bytesWritten);
+    connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readyRead);
+
+//    connect(socket, SIGNAL(bytesWritten(qint64)), this, SLOT(bytesWritten(qint64)));
+//    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+
     socket->connectToHost(ipAddr, portNumber);
     socket->waitForConnected(3000);
     if  (socket->state() != QTcpSocket::ConnectedState)
@@ -57,6 +69,9 @@ void MainWindow::on_pushButton_clicked()
     }
 
     ui->sendPushButton->setEnabled(true);
+    ui->msgPushButton->setEnabled(true);
+    ui->chatSenderField->setEnabled(true);
+
     ui->ipLineEdit->setEnabled(false);
     ui->portLineEdit->setEnabled(false);
 }
@@ -95,5 +110,91 @@ void MainWindow::on_sendPushButton_clicked()
 
         curPosition += curPiece;
     }
+
+    ui->sendPushButton->setEnabled(false);
+    ui->msgPushButton->setEnabled(false);
+    ui->chatSenderField->setEnabled(false);
+
+    ui->ipLineEdit->setEnabled(true);
+    ui->portLineEdit->setEnabled(true);
+}
+
+
+void MainWindow::on_msgPushButton_clicked()
+{
+    sendMessage();
+}
+
+void MainWindow::bytesWritten(qint64 bytes)
+{
+    qDebug() << bytes << "bytes written...";
+}
+
+void MainWindow::readyRead()
+{
+    QByteArray data = socket->readAll();
+    qDebug() << "[SOCKET] Data in: " << data;
+
+    //    while (socket->canReadLine())
+    //    {
+    //        QString data = QString(socket->readLine());
+
+    //        Message msg;
+    //        msg.message = data;
+    //        msg.isMyMsg = false;
+
+    //        message_history->append(msg);
+    //    }
+
+
+    //    updateChatField();
+}
+
+void MainWindow::sendMessage()
+{
+    QString text = ui->chatSenderField->toPlainText();
+    text = text + "\n";
+
+    Message msg;
+    msg.message = text;
+    msg.isMyMsg = true;
+
+    message_history->append(msg);
+    updateChatField();
+
+    socket->write(("[msg]" + text).toUtf8());
+}
+
+// получаем сообщение с сервера
+//void MainWindow::readData()
+//{
+//    QTcpSocket* conn = qobject_cast<QTcpSocket*>(sender());
+//    while (conn->canReadLine())
+//    {
+//        QString data = QString(conn->readLine());
+
+//        Message msg;
+//        msg.message = data;
+//        msg.isMyMsg = false;
+
+//        message_history->append(msg);
+//    }
+
+
+//    updateChatField();
+//}
+
+void MainWindow::updateChatField()
+{
+    QString messages = "";
+    foreach(Message msg, *message_history)
+    {
+        if (!msg.isMyMsg)
+            messages += "\t";
+        messages += msg.message;
+    }
+
+    ui->chatField->clear();
+    ui->chatField->setPlainText(messages);
 }
 
