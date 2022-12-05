@@ -3,6 +3,7 @@
 
 #include <QTcpServer>
 #include <QObject>
+#include <QVector>
 #include "client.h"
 
 class server : public QTcpServer
@@ -13,16 +14,17 @@ public:
     explicit server(QHostAddress host = QHostAddress::Any,
                     quint16 port      = 5555,
                     QObject *parent   = nullptr);
-    //~server();
-    static QList<Client*> clients; //список пользователей
+    QTcpSocket *socket;
 
 public slots:
     void start();
-
-protected:
     void incomingConnection(qintptr handle) Q_DECL_OVERRIDE;
+    void slotReadyRead();
 
 private:
+    QVector <QTcpSocket*> Sockets;
+    QByteArray Data;
+    void SendToClient(QString str);
     QObject *interfaceWindow;
     QHostAddress host;
     quint16      port;

@@ -28,5 +28,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QTcpSocket *socket;
+    QByteArray Data;
+    void SendToServer(QString str);
 };
 #endif // MAINWINDOW_H

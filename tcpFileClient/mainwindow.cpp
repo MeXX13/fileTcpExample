@@ -11,6 +11,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    socket = new QTcpSocket(this);
+    connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readyRead);
+    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
 
     QString ipRange = "(?:[0-1]?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])";
     QRegularExpression ipRegex ("^" + ipRange
@@ -45,9 +48,6 @@ void MainWindow::on_pushButton_clicked()
     QString ipStringAddr = ui->ipLineEdit->text();
     QHostAddress ipAddr(ipStringAddr);
 
-    socket = new QTcpSocket(this);
-    connect(socket, &QTcpSocket::disconnected, socket, &QTcpSocket::deleteLater);
-    connect(socket, &QTcpSocket::readyRead, this, &MainWindow::readyRead);
     socket->connectToHost(ipAddr, portNumber);
     socket->waitForConnected(3000);
     if  (socket->state() != QTcpSocket::ConnectedState)
@@ -105,20 +105,41 @@ void MainWindow::on_sendPushButton_clicked()
 
 void MainWindow::on_sendText_clicked()
 {
-    QString text;
-    text = ui->text->toPlainText();
-    QByteArray qba = "[msg]";
-    qba.append(text.toLocal8Bit());
+//    QString text;
+//    text = ui->text->toPlainText();
+//    QByteArray qba = "[msg]";
+//    qba.append(text.toLocal8Bit());
 
-    socket->write(qba);
+//    socket->write(qba);
 
-    ui->chatWindow->append(text);
+//    ui->chatWindow->append(text);
+
+    SendToServer(ui->text->toPlainText());
 }
 
 void MainWindow::readyRead()
 {
-    QByteArray qba = socket->readAll();
+    QDataStream in(socket);
+    in.setVersion(QDataStream::Qt_6_2);
+    if (in.status() == QDataStream::Ok)
+    {
+        QString str;
+        in >> str;
+        ui->chatWindow->append(str);
+    }
+    else
+    {
+        ui->chatWindow->append("read error");
+    }
+}
 
-    ui->chatWindow->append(qba);
+void MainWindow::SendToServer(QString str)
+{
+    Data.clear();
+    QDataStream out(&Data, QIODevice::WriteOnly);
+    out.setVersion(QDataStream::Qt_6_2);
+    out << str;
+    socket->write(Data);
+    ui->text->clear();
 }
 
