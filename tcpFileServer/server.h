@@ -3,7 +3,9 @@
 
 #include <QTcpServer>
 #include <QObject>
-//#include "savedclients.h"
+#include <QTime>
+
+#include "socketthread.h"
 
 class server : public QTcpServer
 {
@@ -12,22 +14,27 @@ public:
     explicit server(QHostAddress host = QHostAddress::Any,
                     quint16 port      = 5555,
                     QObject *parent   = nullptr);
-    //~server();
-
-public slots:
-    void start();
-//    void sendMessages(QString msg, QTcpSocket *fromSocket);
-
-protected:
-    void incomingConnection(qintptr handle) Q_DECL_OVERRIDE;
 
 private:
     QObject *interfaceWindow;
     QHostAddress host;
     quint16      port;
 
-//signals:
-//    void sendMessagesSignal(QString msg, QTcpSocket *fromSocket);
+    QVector<socketThread *> mSocketThreads;
+
+//    QByteArray Data;
+    quint16 nextBlockSize;
+
+    void SendToClient(QString str);
+
+public slots:
+    void incomingConnection(qintptr handle) Q_DECL_OVERRIDE;
+    void start();
+
+    void getMessagesSlot(QString msg, socketThread *fromSocketThread);
+
+signals:
+    void sendMessagesToClient(QString msg);
 };
 
 #endif // SERVER_H

@@ -10,14 +10,10 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp \
-    server.cpp \
-    socketthread.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    mainwindow.h \
-    server.h \
-    socketthread.h
+    mainwindow.h
 
 FORMS += \
     mainwindow.ui
