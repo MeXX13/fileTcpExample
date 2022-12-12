@@ -34,7 +34,7 @@ public slots:
     void getMessagesSlot(QString msg, socketThread *fromSocketThread);
 
 signals:
-    void sendMessagesToClient(QString msg);
+    void sendMessagesToClient(QString msg, QTcpSocket *socket);
 };
 
 #endif // SERVER_H

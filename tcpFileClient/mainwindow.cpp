@@ -135,19 +135,13 @@ void MainWindow::readyRead()
     QByteArray data = socket->readAll();
     qDebug() << "[SOCKET] Data in: " << data;
 
-    //    while (socket->canReadLine())
-    //    {
-    //        QString data = QString(socket->readLine());
+    Message msg;
+    msg.message = data;
+    msg.isMyMsg = false;
 
-    //        Message msg;
-    //        msg.message = data;
-    //        msg.isMyMsg = false;
+    message_history->append(msg);
 
-    //        message_history->append(msg);
-    //    }
-
-
-    //    updateChatField();
+    updateChatField();
 }
 
 void MainWindow::sendMessage()
@@ -164,25 +158,6 @@ void MainWindow::sendMessage()
 
     socket->write(("[msg]" + text).toUtf8());
 }
-
-// получаем сообщение с сервера
-//void MainWindow::readData()
-//{
-//    QTcpSocket* conn = qobject_cast<QTcpSocket*>(sender());
-//    while (conn->canReadLine())
-//    {
-//        QString data = QString(conn->readLine());
-
-//        Message msg;
-//        msg.message = data;
-//        msg.isMyMsg = false;
-
-//        message_history->append(msg);
-//    }
-
-
-//    updateChatField();
-//}
 
 void MainWindow::updateChatField()
 {

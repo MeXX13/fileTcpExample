@@ -91,8 +91,11 @@ void socketThread::onDisconnected()
     quit();
 }
 
-void socketThread::receiveMessagesFromServerSlot(QString msg)
+void socketThread::receiveMessagesFromServerSlot(QString msg, QTcpSocket *socket)
 {
+    if (socket == m_socket) // на самого себя не пересылаем
+        return;
+
     if (m_socket->state() == QAbstractSocket::ConnectedState)
     {
         m_socket->write(msg.toUtf8());

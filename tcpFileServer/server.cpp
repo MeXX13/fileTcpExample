@@ -7,13 +7,6 @@ server::server(QHostAddress host, quint16 port, QObject *parent)   : QTcpServer(
     // Do nothing
 }
 
-void server::SendToClient(QString str)
-{
-    // emit на все сокеты, с сообщением
-    for (int i = 0; i < mSocketThreads.size(); i++)
-        emit sendMessagesToClient(str);
-}
-
 void server::start()
 {
     // запуск сервера
@@ -25,13 +18,12 @@ void server::start()
 
 void server::getMessagesSlot(QString msg, socketThread *fromSocketThread)
 {
-    foreach(socketThread *socketThread, mSocketThreads)
-    {
-        if (socketThread == fromSocketThread)
-            continue;
-
-        emit sendMessagesToClient(msg);
-    }
+    emit sendMessagesToClient(msg, fromSocketThread->m_socket);
+//    foreach(socketThread *socketThread, mSocketThreads)
+//    {
+//        if (socketThread != fromSocketThread)
+//            emit sendMessagesToClient(msg);
+//    }
 }
 
 void server::incomingConnection(qintptr handle)
@@ -41,8 +33,8 @@ void server::incomingConnection(qintptr handle)
 
     connect(thread, &QThread::finished, thread, &QThread::deleteLater);
 
-    connect(thread, &socketThread::sendMessagesToServerSignal, this, &server::getMessagesSlot);
-    connect(this, &server::sendMessagesToClient, thread, &socketThread::receiveMessagesFromServerSlot);
+    connect(thread, &socketThread::sendMessagesToServerSignal, this, &server::getMessagesSlot, Qt::AutoConnection);
+    connect(this, &server::sendMessagesToClient, thread, &socketThread::receiveMessagesFromServerSlot, Qt::AutoConnection);
 
     mSocketThreads.push_back(thread);
     thread->start();

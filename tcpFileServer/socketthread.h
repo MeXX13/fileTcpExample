@@ -30,15 +30,11 @@ private:
     qintptr     m_socketDescriptor;
     qint32      m_blockSize = 0;
 
-//    QVector<QTcpSocket *> *Sockets;
-//    quint16 nextBlockSize = 0;
-
 public slots:
-    void receiveMessagesFromServerSlot(QString msg);
+    void receiveMessagesFromServerSlot(QString msg, QTcpSocket *socket);
 
 signals:
     void sendMessagesToServerSignal(QString msg, socketThread *fromSocketThread);
-//    void SendToClient(QString str);
 
 };
 
